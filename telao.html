@@ -97,7 +97,7 @@
 
 <div class="qr" id="qr">
   <div class="caixa">
-    <h2>Envie a resposta da sua mesa</h2>
+    <h2>Envie a sua resposta</h2>
     <div id="qrcode"></div>
     <div class="link" id="qr-link"></div>
     <div class="fechar">Clique ou aperte Q para fechar</div>
@@ -119,7 +119,7 @@
   ];
   var revelado = false, dados = [];
 
-  var linkForm = new URL("index.html?turma=" + encodeURIComponent(C.turma), location.href).href;
+  var linkForm = new URL("./?turma=" + encodeURIComponent(C.turma), location.href).href;
 
   // ---------- gráfico de pontos ----------
   function svgEl(tag, at, pai) {
