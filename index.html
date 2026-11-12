@@ -15,7 +15,7 @@
 
   /* topo */
   .topo { margin-bottom: 20px; }
-  .tag { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--laranja); font-weight: bold; }
+  .tag { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--laranja); }
   h1 { font-family: Georgia, "Times New Roman", serif; font-weight: normal; font-size: 34px; line-height: 1.15; margin: 10px 0 0; }
   h1 em { color: var(--laranja); font-style: normal; }
 
@@ -30,9 +30,9 @@
 
   .cols { display: grid; gap: 24px; align-items: start; }
   .cols.quem { grid-template-columns: 1fr 1.5fr; }
-  .cols.sacado { grid-template-columns: 1.4fr .8fr 1.1fr; }
-  .rot { display: block; font-weight: bold; font-size: 15px; margin: 0 0 10px; }
-  .rot .dica { font-weight: normal; color: var(--cinza); }
+  .cols.sacado { grid-template-columns: 1.6fr 1fr; }
+  .rot { display: block; font-weight: normal; font-size: 15px; color: var(--cinza); margin: 0 0 10px; }
+  .rot .dica { color: #A8968A; }
 
   input[type=text] {
     width: 100%; font: inherit; font-size: 18px; color: var(--marrom); background: var(--creme);
@@ -61,7 +61,7 @@
   /* envio */
   .envio { display: flex; flex-direction: column; justify-content: center; align-items: stretch; padding: 0 8px; }
   button { font: inherit; font-weight: bold; border: 0; border-radius: 999px; padding: 18px 28px; cursor: pointer; }
-  .enviar { background: var(--laranja); color: var(--branco); width: 100%; font-size: 19px; transition: transform .1s, box-shadow .15s; box-shadow: 0 6px 16px rgba(239,112,26,.25); }
+  .enviar { background: var(--laranja); color: var(--branco); width: 100%; font-size: 19px; font-weight: normal; letter-spacing: .01em; transition: transform .1s, box-shadow .15s; box-shadow: 0 6px 16px rgba(239,112,26,.25); }
   .enviar:hover { box-shadow: 0 8px 20px rgba(239,112,26,.32); }
   .enviar:active { transform: translateY(1px); }
   .enviar:disabled { opacity: .6; cursor: wait; }
@@ -141,14 +141,6 @@
               <label class="rot" for="concentracao">Concentração</label>
               <div class="unid"><input id="concentracao" type="text" inputmode="decimal" placeholder="0,0" data-min="0" data-max="30"><b>%</b></div>
             </div>
-            <div class="campo">
-              <span class="rot">Dentro do limite do regulamento?</span>
-              <div class="opcoes">
-                <label><input type="radio" name="dentro_limite" value="Sim"><span>Sim</span></label>
-                <label><input type="radio" name="dentro_limite" value="Não"><span>Não</span></label>
-                <label><input type="radio" name="dentro_limite" value="Não sei"><span>Não sei</span></label>
-              </div>
-            </div>
           </div>
           <div class="aviso" id="av-concentracao"></div>
         </section>
@@ -173,7 +165,6 @@
   <div class="ok" id="ok">
     <div class="check">✓</div>
     <h2>Resposta enviada</h2>
-    <p>Olhe para o telão: o seu ponto já está lá.</p>
     <button type="button" id="outra">Enviar outra resposta</button>
   </div>
 </main>
@@ -208,7 +199,6 @@
       nome: texto("nome"),
       modelo: radio("modelo"),
       maior_sacado: texto("maior_sacado"),
-      dentro_limite: radio("dentro_limite"),
     };
     if (!dados.nome) { ok = false; primeiro = primeiro || "nome"; document.getElementById("av-nome").classList.add("on"); marcar("nome", true); }
 
