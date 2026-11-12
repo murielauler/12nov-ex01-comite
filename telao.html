@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ex 01 · Telão</title>
+<style>
+  :root {
+    --laranja: #EF701A; --marrom: #30251F; --creme: #FFF9F1;
+    --cinza: #755B4A; --linha: #D9CFC6; --branco: #FFFFFF; --verde: #2E7D4F;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--creme); color: var(--marrom); font-family: Arial, Helvetica, sans-serif; }
+  body { display: grid; grid-template-rows: auto 1fr; padding: 1.6vh 1.6vw; gap: 1.4vh; min-height: 100vh; }
+  header { display: flex; align-items: center; gap: 2vw; }
+  .titulo { flex: 1; min-width: 0; }
+  .tag { font-size: clamp(11px, 1vw, 18px); letter-spacing: .08em; text-transform: uppercase; color: var(--laranja); font-weight: bold; }
+  h1 { font-family: Georgia, "Times New Roman", serif; font-weight: normal; font-size: clamp(22px, 2.6vw, 52px); margin: .2vh 0 0; line-height: 1.1; }
+  h1 em { color: var(--laranja); font-style: normal; }
+  .contador { text-align: right; line-height: 1; }
+  .contador b { display: block; font-family: Georgia, serif; font-weight: normal; font-size: clamp(36px, 4.6vw, 96px); color: var(--laranja); }
+  .contador span { font-size: clamp(12px, 1.1vw, 20px); color: var(--cinza); }
+  .controles { display: flex; flex-direction: column; gap: .8vh; }
+  button { font: inherit; font-weight: bold; font-size: clamp(12px, 1vw, 18px); border-radius: 999px; padding: .9vh 1.2vw; cursor: pointer; border: 1px solid var(--linha); background: var(--branco); color: var(--marrom); white-space: nowrap; }
+  button.revelar { background: var(--laranja); color: var(--branco); border-color: var(--laranja); }
+  button.revelar.on { background: var(--marrom); border-color: var(--marrom); }
+  .status { font-size: clamp(10px, .85vw, 15px); color: var(--cinza); text-align: center; }
+  .status i { display: inline-block; width: .7em; height: .7em; border-radius: 50%; background: var(--verde); margin-right: .4em; vertical-align: -1px; }
+  .status.off i { background: #B3261E; }
+
+  .grade { display: grid; grid-template-columns: 2.1fr 1fr; gap: 1.4vw; min-height: 0; }
+  .pontos { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 1.4vh 1.4vw; min-height: 0; }
+  .barras { display: grid; grid-template-rows: auto auto 1fr; gap: 1.4vh; min-height: 0; }
+  .painel { background: var(--branco); border: 1px solid var(--linha); border-radius: 14px; padding: 1.4vh 1.2vw; display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+  .painel h2 { font-family: Georgia, serif; font-weight: normal; font-size: clamp(16px, 1.7vw, 34px); margin: 0; line-height: 1.1; }
+  .painel h2 small { font-family: Arial, sans-serif; font-size: .55em; color: var(--cinza); margin-left: .4em; }
+  .faixa { font-size: clamp(12px, 1.05vw, 20px); color: var(--cinza); margin-top: .4vh; min-height: 1.2em; }
+  .faixa b { color: var(--marrom); }
+  .plot { flex: 1; min-height: 120px; position: relative; }
+  .plot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .vazio { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--cinza); font-size: clamp(13px, 1.1vw, 20px); }
+
+  .lista { list-style: none; margin: 1vh 0 0; padding: 0; display: grid; gap: .9vh; }
+  .lista li { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: .3vh .6vw; font-size: clamp(12px, 1.05vw, 20px); }
+  .lista .rot { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lista .n { font-weight: bold; font-variant-numeric: tabular-nums; }
+  .lista .trilho { grid-column: 1 / -1; height: 1.3vh; min-height: 8px; background: #F3ECE4; border-radius: 99px; overflow: hidden; }
+  .lista .barra { height: 100%; background: var(--marrom); border-radius: 99px; transition: width .5s; }
+  .lista li.certo .barra { background: var(--laranja); }
+  .lista li.certo .rot { color: var(--laranja); font-weight: bold; }
+  .lista li.certo .rot::after { content: "  ✓ comitê"; font-size: .85em; }
+
+  .qr { position: fixed; inset: 0; background: rgba(48,37,31,.92); display: none; align-items: center; justify-content: center; z-index: 10; }
+  .qr.on { display: flex; }
+  .qr .caixa { background: var(--creme); border-radius: 20px; padding: 4vh 4vw; text-align: center; max-width: 92vw; }
+  .qr h2 { font-family: Georgia, serif; font-weight: normal; font-size: clamp(22px, 3vw, 56px); margin: 0 0 2vh; }
+  .qr #qrcode { display: inline-block; background: var(--branco); padding: 2vh; border-radius: 12px; }
+  .qr #qrcode img, .qr #qrcode canvas { width: min(52vh, 70vw) !important; height: min(52vh, 70vw) !important; }
+  .qr .link { font-size: clamp(14px, 1.6vw, 30px); margin-top: 2vh; word-break: break-all; color: var(--marrom); }
+  .qr .fechar { margin-top: 2vh; font-size: clamp(12px, 1vw, 18px); color: var(--cinza); }
+
+  @media (max-width: 900px) {
+    body { height: auto; }
+    header { flex-wrap: wrap; }
+    .grade, .pontos { grid-template-columns: 1fr; grid-template-rows: none; }
+    .pontos .painel { height: 260px; }
+    .barras { grid-template-rows: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="titulo">
+    <div class="tag">Ex 01 · FIDC Alvorada · turma <span id="turma"></span></div>
+    <h1>Mesma base, mesmas perguntas. <em>Quantas respostas?</em></h1>
+  </div>
+  <div class="contador"><b id="total">0</b><span>respostas</span></div>
+  <div class="controles">
+    <button class="revelar" id="revelar" title="Atalho: R">Revelar comitê</button>
+    <button id="btn-qr" title="Atalho: Q">QR do formulário</button>
+    <div class="status" id="status"><i></i>ao vivo</div>
+  </div>
+</header>
+
+<div class="grade">
+  <section class="pontos">
+    <div class="painel" id="p-carteira"><h2>1. Carteira em aberto <small>R$ mi</small></h2><div class="faixa"></div><div class="plot"></div></div>
+    <div class="painel" id="p-inadimplencia"><h2>2. Inadimplência <small>%</small></h2><div class="faixa"></div><div class="plot"></div></div>
+    <div class="painel" id="p-concentracao"><h2>3. Concentração do maior sacado <small>%</small></h2><div class="faixa"></div><div class="plot"></div></div>
+    <div class="painel" id="p-outubro"><h2>4. Previsão de outubro <small>R$ mi</small></h2><div class="faixa"></div><div class="plot"></div></div>
+  </section>
+  <section class="barras">
+    <div class="painel"><h2>Dentro do limite?</h2><ul class="lista" id="l-limite"></ul></div>
+    <div class="painel"><h2>Principal ponto de atenção</h2><ul class="lista" id="l-ponto"></ul></div>
+    <div class="painel"><h2>Quem é o maior sacado?</h2><ul class="lista" id="l-sacado"></ul></div>
+  </section>
+</div>
+
+<div class="qr" id="qr">
+  <div class="caixa">
+    <h2>Envie a resposta da sua mesa</h2>
+    <div id="qrcode"></div>
+    <div class="link" id="qr-link"></div>
+    <div class="fechar">Clique ou aperte Q para fechar</div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="config.js"></script>
+<script>
+(function () {
+  var C = window.EX01;
+  var NS = "http://www.w3.org/2000/svg";
+  var COMITE = { carteira: 46.5, inadimplencia: 8.7, concentracao: 12.5, outubro: 24.5, dentro_limite: "Não", ponto_atencao: "Concentração no maior sacado", sacado: "boa vista" };
+  var METRICAS = [
+    { id: "carteira", faixa: [30, 60] },
+    { id: "inadimplencia", faixa: [0, 30] },
+    { id: "concentracao", faixa: [0, 30] },
+    { id: "outubro", faixa: [10, 40] },
+  ];
+  var revelado = false, dados = [];
+
+  document.getElementById("turma").textContent = C.turma;
+  var linkForm = new URL("index.html?turma=" + encodeURIComponent(C.turma), location.href).href;
+
+  // ---------- gráfico de pontos ----------
+  function svgEl(tag, at, pai) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in at) e.setAttribute(k, at[k]);
+    if (pai) pai.appendChild(e);
+    return e;
+  }
+  function passoBonito(amp) {
+    var bruto = amp / 6, p = Math.pow(10, Math.floor(Math.log10(bruto))), r = bruto / p;
+    return (r < 1.5 ? 1 : r < 3.5 ? 2 : r < 7.5 ? 5 : 10) * p;
+  }
+
+  function desenharPontos(m) {
+    var painel = document.getElementById("p-" + m.id), plot = painel.querySelector(".plot"), faixaEl = painel.querySelector(".faixa");
+    var vals = dados.map(function (d) { return d[m.id]; }).filter(function (v) { return v !== null && v !== undefined; }).map(Number).sort(function (a, b) { return a - b; });
+    plot.innerHTML = "";
+    if (!vals.length) {
+      faixaEl.textContent = "";
+      plot.innerHTML = '<div class="vazio">Aguardando respostas…</div>';
+      return;
+    }
+    var mn = vals[0], mx = vals[vals.length - 1];
+    var acertos = vals.filter(function (v) { return Math.abs(v - COMITE[m.id]) < 0.051; }).length;
+    faixaEl.innerHTML = vals.length === 1 ? "1 resposta: <b>" + C.fmt(mn) + "</b>" :
+      "de <b>" + C.fmt(mn) + "</b> a <b>" + C.fmt(mx) + "</b> · " + vals.length + " respostas" +
+      (revelado ? " · <b style='color:var(--laranja)'>" + acertos + " bate" + (acertos === 1 ? "" : "m") + " com o comitê</b>" : "");
+
+    var W = plot.clientWidth, H = plot.clientHeight;
+    if (W < 50 || H < 50) return;
+    var mL = 8, mR = 8, mT = revelado ? Math.max(26, H * 0.14) : 10, mB = Math.max(28, H * 0.16);
+    var lo = Math.min(m.faixa[0], mn, COMITE[m.id]), hi = Math.max(m.faixa[1], mx, COMITE[m.id]);
+    var pad = (hi - lo) * 0.03; lo -= pad; hi += pad;
+    var x = function (v) { return mL + (v - lo) / (hi - lo) * (W - mL - mR); };
+    var base = H - mB, altura = base - mT;
+
+    var svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, role: "img" }, plot);
+    var fs = Math.max(11, Math.min(22, H * 0.075));
+
+    // eixo
+    svgEl("line", { x1: mL, x2: W - mR, y1: base + 0.5, y2: base + 0.5, stroke: "#D9CFC6", "stroke-width": 2 }, svg);
+    var passo = passoBonito(hi - lo);
+    for (var t = Math.ceil(lo / passo) * passo; t <= hi + 1e-9; t += passo) {
+      var tx = x(t);
+      svgEl("line", { x1: tx, x2: tx, y1: base, y2: base + 6, stroke: "#D9CFC6", "stroke-width": 2 }, svg);
+      var lb = svgEl("text", { x: tx, y: base + 8 + fs, "text-anchor": "middle", "font-size": fs, fill: "#755B4A", "font-family": "Arial" }, svg);
+      lb.textContent = C.fmt(t, passo < 1 ? 1 : 0);
+    }
+
+    // raio: cabe todo mundo na altura disponível
+    var r = Math.max(4, Math.min(H * 0.07, 16, (W - mL - mR) / 40));
+    var pos;
+    for (var tent = 0; tent < 8; tent++) {
+      pos = []; var estourou = false;
+      vals.forEach(function (v) {
+        var cx = x(v), cy = base - r - 2, passoY = r * 0.5;
+        for (var k = 0; k < 400; k++) {
+          var bate = pos.some(function (p) { var dx = p.cx - cx, dy = p.cy - cy; return dx * dx + dy * dy < (2 * r + 1.5) * (2 * r + 1.5); });
+          if (!bate) break;
+          cy -= passoY;
+        }
+        if (cy - r < mT) estourou = true;
+        pos.push({ cx: cx, cy: cy, v: v });
+      });
+      if (!estourou || r <= 4) break;
+      r *= 0.82;
+    }
+
+    // linha do comitê
+    if (revelado) {
+      var cxC = x(COMITE[m.id]);
+      svgEl("line", { x1: cxC, x2: cxC, y1: mT - 4, y2: base, stroke: "#EF701A", "stroke-width": 3, "stroke-dasharray": "8 6" }, svg);
+      var anc = cxC < W * 0.2 ? "start" : cxC > W * 0.8 ? "end" : "middle";
+      var ct = svgEl("text", { x: cxC, y: mT - 10, "text-anchor": anc, "font-size": fs * 1.05, "font-weight": "bold", fill: "#EF701A", "font-family": "Arial" }, svg);
+      ct.textContent = "Comitê: " + C.fmt(COMITE[m.id]);
+    }
+
+    pos.forEach(function (p) {
+      var certo = revelado && Math.abs(p.v - COMITE[m.id]) < 0.051;
+      var c = svgEl("circle", { cx: p.cx, cy: p.cy, r: r, fill: certo ? "#EF701A" : "#30251F", "fill-opacity": revelado && !certo ? 0.55 : 0.9, stroke: "#FFFFFF", "stroke-width": 1.5 }, svg);
+      svgEl("title", {}, c).textContent = C.fmt(p.v);
+    });
+  }
+
+  // ---------- barras ----------
+  function desenharLista(id, itens, ehCerto) {
+    var ul = document.getElementById(id), max = Math.max(1, Math.max.apply(null, itens.map(function (i) { return i.n; })));
+    ul.innerHTML = "";
+    itens.forEach(function (i) {
+      var li = document.createElement("li");
+      if (revelado && ehCerto(i.rotulo)) li.className = "certo";
+      var rot = document.createElement("span"); rot.className = "rot"; rot.textContent = i.rotulo;
+      var n = document.createElement("span"); n.className = "n"; n.textContent = i.n;
+      var tr = document.createElement("div"); tr.className = "trilho";
+      var b = document.createElement("div"); b.className = "barra"; b.style.width = (i.n / max * 100) + "%";
+      tr.appendChild(b); li.appendChild(rot); li.appendChild(n); li.appendChild(tr); ul.appendChild(li);
+    });
+  }
+  function contar(campo, ordem) {
+    return ordem.map(function (o) { return { rotulo: o, n: dados.filter(function (d) { return d[campo] === o; }).length }; });
+  }
+  function sacados() {
+    var grupos = {};
+    dados.forEach(function (d) {
+      if (!d.maior_sacado) return;
+      var orig = d.maior_sacado.replace(/\s+/g, " ").trim();
+      var chave = orig.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\b(ltda|s\.?a\.?|me|eireli)\b\.?/g, "").replace(/[^a-z0-9 ]/g, "").trim();
+      if (!grupos[chave]) grupos[chave] = { rotulo: orig, n: 0 };
+      grupos[chave].n++;
+    });
+    var arr = Object.keys(grupos).map(function (k) { return grupos[k]; }).sort(function (a, b) { return b.n - a.n; });
+    if (arr.length > 5) {
+      var resto = arr.slice(4).reduce(function (s, i) { return s + i.n; }, 0);
+      arr = arr.slice(0, 4).concat([{ rotulo: "Outros (" + (arr.length - 4) + ")", n: resto }]);
+    }
+    return arr.length ? arr : [{ rotulo: "Aguardando respostas…", n: 0 }];
+  }
+
+  function desenharTudo() {
+    document.getElementById("total").textContent = dados.length;
+    METRICAS.forEach(desenharPontos);
+    desenharLista("l-limite", contar("dentro_limite", ["Sim", "Não", "Não sei"]), function (r) { return r === COMITE.dentro_limite; });
+    desenharLista("l-ponto", contar("ponto_atencao", ["Concentração no maior sacado", "Inadimplência", "Construção civil", "Qualidade da base", "Outro"]), function (r) { return r === COMITE.ponto_atencao; });
+    desenharLista("l-sacado", sacados(), function (r) { return r.toLowerCase().indexOf(COMITE.sacado) >= 0; });
+  }
+
+  // ---------- dados ao vivo ----------
+  var assinatura = "";
+  function buscar() {
+    var u = C.url + "/rest/v1/" + C.tabela + "?select=id,carteira,inadimplencia,maior_sacado,concentracao,dentro_limite,outubro,ponto_atencao&turma=eq." + encodeURIComponent(C.turma) + "&order=id.asc&limit=1000";
+    fetch(u, { headers: { apikey: C.key }, cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (json) {
+        document.getElementById("status").className = "status";
+        document.getElementById("status").innerHTML = "<i></i>ao vivo";
+        var nova = json.map(function (d) { return d.id; }).join(",");
+        if (nova !== assinatura) { assinatura = nova; dados = json; desenharTudo(); }
+      })
+      .catch(function (e) {
+        console.error(e);
+        document.getElementById("status").className = "status off";
+        document.getElementById("status").innerHTML = "<i></i>sem conexão";
+      });
+  }
+  buscar();
+  setInterval(buscar, 3000);
+
+  var tm; window.addEventListener("resize", function () { clearTimeout(tm); tm = setTimeout(desenharTudo, 120); });
+
+  // ---------- controles ----------
+  var btnRev = document.getElementById("revelar");
+  function alternarRevelar() {
+    revelado = !revelado;
+    btnRev.classList.toggle("on", revelado);
+    btnRev.textContent = revelado ? "Esconder comitê" : "Revelar comitê";
+    desenharTudo();
+  }
+  btnRev.addEventListener("click", alternarRevelar);
+
+  var qr = document.getElementById("qr"), qrFeito = false;
+  function alternarQR() {
+    if (!qrFeito) {
+      document.getElementById("qr-link").textContent = linkForm.replace(/^https?:\/\//, "");
+      if (window.QRCode) new QRCode(document.getElementById("qrcode"), { text: linkForm, width: 512, height: 512, colorDark: "#30251F", colorLight: "#FFFFFF", correctLevel: QRCode.CorrectLevel.M });
+      qrFeito = true;
+    }
+    qr.classList.toggle("on");
+  }
+  document.getElementById("btn-qr").addEventListener("click", alternarQR);
+  qr.addEventListener("click", alternarQR);
+  document.addEventListener("keydown", function (e) {
+    if (e.target.tagName === "INPUT") return;
+    if (e.key === "r" || e.key === "R") alternarRevelar();
+    if (e.key === "q" || e.key === "Q") alternarQR();
+    if (e.key === "Escape" && qr.classList.contains("on")) alternarQR();
+  });
+})();
+</script>
+</body>
+</html>

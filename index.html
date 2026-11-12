@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ex 01 · Respostas do comitê</title>
+<style>
+  :root {
+    --laranja: #EF701A; --marrom: #30251F; --creme: #FFF9F1;
+    --cinza: #755B4A; --linha: #D9CFC6; --erro: #B3261E; --branco: #FFFFFF;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--creme); color: var(--marrom); font-family: Arial, Helvetica, sans-serif; font-size: 17px; line-height: 1.4; }
+  main { max-width: 640px; margin: 0 auto; padding: 24px 16px 64px; }
+  .tag { display: inline-block; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--laranja); font-weight: bold; }
+  h1 { font-family: Georgia, "Times New Roman", serif; font-weight: normal; font-size: 30px; line-height: 1.15; margin: 6px 0 8px; }
+  h1 em { color: var(--laranja); font-style: normal; }
+  .sub { color: var(--cinza); margin: 0 0 24px; }
+  fieldset { border: 0; border-top: 1px solid var(--linha); margin: 0; padding: 18px 0 4px; }
+  legend { font-family: Georgia, serif; font-size: 20px; padding: 0 8px 0 0; }
+  legend span { color: var(--laranja); }
+  label { display: block; font-weight: bold; margin: 12px 0 6px; }
+  .dica { font-weight: normal; color: var(--cinza); font-size: 14px; }
+  input[type=text], input[type=number], select {
+    width: 100%; font: inherit; color: var(--marrom); background: var(--branco);
+    border: 1px solid var(--linha); border-radius: 8px; padding: 11px 12px; min-height: 46px;
+  }
+  input:focus, select:focus { outline: 2px solid var(--laranja); outline-offset: 1px; border-color: var(--laranja); }
+  .unid { position: relative; }
+  .unid input { padding-right: 70px; }
+  .unid b { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--cinza); font-weight: normal; pointer-events: none; }
+  .opcoes { display: flex; flex-wrap: wrap; gap: 8px; }
+  .opcoes label { margin: 0; font-weight: normal; }
+  .opcoes input { position: absolute; opacity: 0; pointer-events: none; }
+  .opcoes span { display: inline-block; padding: 10px 14px; border: 1px solid var(--linha); border-radius: 999px; background: var(--branco); cursor: pointer; }
+  .opcoes input:checked + span { background: var(--marrom); color: var(--creme); border-color: var(--marrom); }
+  .opcoes input:focus-visible + span { outline: 2px solid var(--laranja); outline-offset: 2px; }
+  .linha2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 480px) { .linha2 { grid-template-columns: 1fr; } }
+  .aviso { color: var(--erro); font-size: 14px; margin-top: 6px; display: none; }
+  .aviso.on { display: block; }
+  button { font: inherit; font-weight: bold; border: 0; border-radius: 999px; padding: 15px 28px; cursor: pointer; }
+  .enviar { background: var(--laranja); color: var(--branco); width: 100%; margin-top: 28px; font-size: 18px; }
+  .enviar:disabled { opacity: .6; cursor: wait; }
+  .msg { margin-top: 14px; color: var(--erro); }
+  .ok { display: none; text-align: center; padding: 48px 8px; }
+  .ok .check { width: 72px; height: 72px; border-radius: 50%; background: var(--laranja); color: var(--branco); font-size: 40px; line-height: 72px; margin: 0 auto 16px; }
+  .ok h2 { font-family: Georgia, serif; font-weight: normal; font-size: 28px; margin: 0 0 8px; }
+  .ok p { color: var(--cinza); }
+  .ok button { background: transparent; color: var(--marrom); border: 1px solid var(--linha); margin-top: 16px; }
+</style>
+</head>
+<body>
+<main>
+  <div id="form-box">
+    <span class="tag">Ex 01 · FIDC Alvorada · 20/10/2026</span>
+    <h1>O que o Claude respondeu ao <em>comitê</em>?</h1>
+    <p class="sub">Copie os números que vieram na resposta da sua mesa, do jeito que vieram. Não precisa corrigir nada.</p>
+
+    <form id="f" novalidate>
+      <fieldset>
+        <legend>Quem está enviando</legend>
+        <label for="nome">Nome ou mesa <span class="dica">(obrigatório)</span></label>
+        <input id="nome" name="nome" type="text" maxlength="60" autocomplete="off" placeholder="Ex.: Mesa 3" required>
+        <div class="aviso" id="av-nome">Coloque o nome ou o número da mesa.</div>
+
+        <label>Modelo usado</label>
+        <div class="opcoes">
+          <label><input type="radio" name="modelo" value="Sonnet"><span>Sonnet</span></label>
+          <label><input type="radio" name="modelo" value="Opus"><span>Opus</span></label>
+          <label><input type="radio" name="modelo" value="Haiku"><span>Haiku</span></label>
+          <label><input type="radio" name="modelo" value="Outro"><span>Outro</span></label>
+          <label><input type="radio" name="modelo" value="Não sei"><span>Não sei</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span>1.</span> Carteira em aberto</legend>
+        <label for="carteira">Valor <span class="dica">em R$ milhões</span></label>
+        <div class="unid"><input id="carteira" type="text" inputmode="decimal" placeholder="0,0" data-min="30" data-max="60"><b>R$ mi</b></div>
+        <div class="aviso" id="av-carteira"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span>2.</span> Inadimplência</legend>
+        <label for="inadimplencia">Percentual</label>
+        <div class="unid"><input id="inadimplencia" type="text" inputmode="decimal" placeholder="0,0" data-min="0" data-max="30"><b>%</b></div>
+        <div class="aviso" id="av-inadimplencia"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span>3.</span> Maior sacado</legend>
+        <div class="linha2">
+          <div>
+            <label for="maior_sacado">Quem é</label>
+            <input id="maior_sacado" type="text" maxlength="80" autocomplete="off" placeholder="Nome do sacado">
+          </div>
+          <div>
+            <label for="concentracao">Concentração dele</label>
+            <div class="unid"><input id="concentracao" type="text" inputmode="decimal" placeholder="0,0" data-min="0" data-max="30"><b>%</b></div>
+          </div>
+        </div>
+        <div class="aviso" id="av-concentracao"></div>
+
+        <label>Está dentro do limite do regulamento?</label>
+        <div class="opcoes">
+          <label><input type="radio" name="dentro_limite" value="Sim"><span>Sim</span></label>
+          <label><input type="radio" name="dentro_limite" value="Não"><span>Não</span></label>
+          <label><input type="radio" name="dentro_limite" value="Não sei"><span>Não sei</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span>4.</span> Previsão de outubro</legend>
+        <label for="outubro">Fechamento da originação <span class="dica">em R$ milhões</span></label>
+        <div class="unid"><input id="outubro" type="text" inputmode="decimal" placeholder="0,0" data-min="10" data-max="40"><b>R$ mi</b></div>
+        <div class="aviso" id="av-outubro"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span>5.</span> Principal ponto de atenção</legend>
+        <div class="opcoes">
+          <label><input type="radio" name="ponto_atencao" value="Concentração no maior sacado"><span>Concentração no maior sacado</span></label>
+          <label><input type="radio" name="ponto_atencao" value="Inadimplência"><span>Inadimplência</span></label>
+          <label><input type="radio" name="ponto_atencao" value="Construção civil"><span>Construção civil</span></label>
+          <label><input type="radio" name="ponto_atencao" value="Qualidade da base"><span>Qualidade da base</span></label>
+          <label><input type="radio" name="ponto_atencao" value="Outro"><span>Outro</span></label>
+        </div>
+      </fieldset>
+
+      <button class="enviar" id="btn" type="submit">Enviar resposta</button>
+      <div class="msg" id="msg" role="alert"></div>
+    </form>
+  </div>
+
+  <div class="ok" id="ok">
+    <div class="check">✓</div>
+    <h2>Resposta enviada</h2>
+    <p>Olhe para o telão: o seu ponto já está lá.</p>
+    <button type="button" id="outra">Enviar outra resposta</button>
+  </div>
+</main>
+
+<script src="config.js"></script>
+<script>
+(function () {
+  var C = window.EX01, f = document.getElementById("f"), btn = document.getElementById("btn"), msg = document.getElementById("msg");
+  var numericos = ["carteira", "inadimplencia", "concentracao", "outubro"];
+  var unidades = { carteira: "R$ mi", inadimplencia: "%", concentracao: "%", outubro: "R$ mi" };
+  var confirmados = {}; // valor fora da faixa que a pessoa confirmou clicando de novo
+
+  function radio(nome) { var r = f.querySelector('input[name="' + nome + '"]:checked'); return r ? r.value : null; }
+  function texto(id) { var v = document.getElementById(id).value.trim(); return v || null; }
+
+  numericos.forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      delete confirmados[id];
+      document.getElementById("av-" + id).classList.remove("on");
+    });
+  });
+  document.getElementById("nome").addEventListener("input", function () { document.getElementById("av-nome").classList.remove("on"); });
+
+  f.addEventListener("submit", function (e) {
+    e.preventDefault();
+    msg.textContent = "";
+    var ok = true, primeiro = null;
+    var dados = {
+      turma: C.turma,
+      nome: texto("nome"),
+      modelo: radio("modelo"),
+      maior_sacado: texto("maior_sacado"),
+      dentro_limite: radio("dentro_limite"),
+      ponto_atencao: radio("ponto_atencao"),
+    };
+    if (!dados.nome) { ok = false; primeiro = primeiro || "nome"; document.getElementById("av-nome").classList.add("on"); }
+
+    numericos.forEach(function (id) {
+      var el = document.getElementById(id), av = document.getElementById("av-" + id);
+      var bruto = el.value.trim(), n = C.numero(bruto);
+      dados[id] = null;
+      if (!bruto) return;
+      if (n === null) {
+        av.textContent = "Não entendi esse número. Use só algarismos e vírgula, por exemplo 45,4.";
+        av.classList.add("on"); ok = false; primeiro = primeiro || id; return;
+      }
+      var min = +el.dataset.min, max = +el.dataset.max;
+      if ((n < min || n > max) && confirmados[id] !== n) {
+        av.textContent = "Esse valor está fora do esperado (" + min + " a " + max + " " + unidades[id] + "). Confira a unidade. Se o Claude respondeu isso mesmo, clique em Enviar de novo.";
+        av.classList.add("on"); confirmados[id] = n; ok = false; primeiro = primeiro || id; return;
+      }
+      dados[id] = n;
+    });
+
+    if (!ok) { document.getElementById(primeiro).focus(); return; }
+
+    btn.disabled = true; btn.textContent = "Enviando…";
+    fetch(C.url + "/rest/v1/" + C.tabela, {
+      method: "POST",
+      headers: { "apikey": C.key, "Content-Type": "application/json", "Prefer": "return=minimal" },
+      body: JSON.stringify(dados),
+    }).then(function (r) {
+      if (!r.ok) return r.text().then(function (t) { throw new Error(t || r.status); });
+      document.getElementById("form-box").style.display = "none";
+      document.getElementById("ok").style.display = "block";
+      window.scrollTo(0, 0);
+    }).catch(function (err) {
+      console.error(err);
+      msg.textContent = "Não consegui enviar. Verifique a internet e tente de novo.";
+    }).finally(function () {
+      btn.disabled = false; btn.textContent = "Enviar resposta";
+    });
+  });
+
+  document.getElementById("outra").addEventListener("click", function () {
+    f.reset(); confirmados = {};
+    document.getElementById("ok").style.display = "none";
+    document.getElementById("form-box").style.display = "block";
+    document.getElementById("nome").focus();
+  });
+})();
+</script>
+</body>
+</html>
