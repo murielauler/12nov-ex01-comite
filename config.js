@@ -1,7 +1,7 @@
 // Conexão com o Supabase (chave pública: só permite inserir e ler respostas)
 window.EX01 = {
-  url: "SUPABASE_URL",
-  key: "SUPABASE_PUBLISHABLE_KEY",
+  url: "https://vftqqpsnjuzwxylcipoh.supabase.co",
+  key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmdHFxcHNuanV6d3h5bGNpcG9oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczNjc5MjIsImV4cCI6MjA2Mjk0MzkyMn0.99dINP5V7hoXdz25sB4OK-gFPwRLIQJ-9esw7vBVwCU",
   tabela: "ex01_respostas",
 };
 

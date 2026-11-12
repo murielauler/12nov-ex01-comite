@@ -30,7 +30,7 @@
 
   .grade { display: grid; grid-template-columns: 2.1fr 1fr; gap: 1.4vw; min-height: 0; }
   .pontos { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 1.4vh 1.4vw; min-height: 0; }
-  .barras { display: grid; grid-template-rows: auto auto 1fr; gap: 1.4vh; min-height: 0; }
+  .barras { display: grid; grid-template-rows: auto 1fr; gap: 1.4vh; min-height: 0; }
   .painel { background: var(--branco); border: 1px solid var(--linha); border-radius: 14px; padding: 1.4vh 1.2vw; display: flex; flex-direction: column; min-height: 0; min-width: 0; }
   .painel h2 { font-family: Georgia, serif; font-weight: normal; font-size: clamp(16px, 1.7vw, 34px); margin: 0; line-height: 1.1; }
   .painel h2 small { font-family: Arial, sans-serif; font-size: .55em; color: var(--cinza); margin-left: .4em; }
@@ -71,7 +71,7 @@
 <body>
 <header>
   <div class="titulo">
-    <div class="tag">Ex 01 · FIDC Alvorada · turma <span id="turma"></span></div>
+    <div class="tag">Ex 01 · FIDC Alvorada</div>
     <h1>Mesma base, mesmas perguntas. <em>Quantas respostas?</em></h1>
   </div>
   <div class="contador"><b id="total">0</b><span>respostas</span></div>
@@ -91,7 +91,6 @@
   </section>
   <section class="barras">
     <div class="painel"><h2>Dentro do limite?</h2><ul class="lista" id="l-limite"></ul></div>
-    <div class="painel"><h2>Principal ponto de atenção</h2><ul class="lista" id="l-ponto"></ul></div>
     <div class="painel"><h2>Quem é o maior sacado?</h2><ul class="lista" id="l-sacado"></ul></div>
   </section>
 </div>
@@ -111,7 +110,7 @@
 (function () {
   var C = window.EX01;
   var NS = "http://www.w3.org/2000/svg";
-  var COMITE = { carteira: 46.5, inadimplencia: 8.7, concentracao: 12.5, outubro: 24.5, dentro_limite: "Não", ponto_atencao: "Concentração no maior sacado", sacado: "boa vista" };
+  var COMITE = { carteira: 46.5, inadimplencia: 8.7, concentracao: 12.5, outubro: 24.5, dentro_limite: "Não", sacado: "boa vista" };
   var METRICAS = [
     { id: "carteira", faixa: [30, 60] },
     { id: "inadimplencia", faixa: [0, 30] },
@@ -120,7 +119,6 @@
   ];
   var revelado = false, dados = [];
 
-  document.getElementById("turma").textContent = C.turma;
   var linkForm = new URL("index.html?turma=" + encodeURIComponent(C.turma), location.href).href;
 
   // ---------- gráfico de pontos ----------
@@ -130,8 +128,8 @@
     if (pai) pai.appendChild(e);
     return e;
   }
-  function passoBonito(amp) {
-    var bruto = amp / 6, p = Math.pow(10, Math.floor(Math.log10(bruto))), r = bruto / p;
+  function passoBonito(amp, nTicks) {
+    var bruto = amp / nTicks, p = Math.pow(10, Math.floor(Math.log10(bruto))), r = bruto / p;
     return (r < 1.5 ? 1 : r < 3.5 ? 2 : r < 7.5 ? 5 : 10) * p;
   }
 
@@ -154,7 +152,7 @@
     if (W < 50 || H < 50) return;
     var mL = 8, mR = 8, mT = revelado ? Math.max(26, H * 0.14) : 10, mB = Math.max(28, H * 0.16);
     var lo = Math.min(m.faixa[0], mn, COMITE[m.id]), hi = Math.max(m.faixa[1], mx, COMITE[m.id]);
-    var pad = (hi - lo) * 0.03; lo -= pad; hi += pad;
+    var pad = (hi - lo) * 0.03; lo = Math.max(lo >= 0 ? 0 : lo, lo - pad); hi += pad;
     var x = function (v) { return mL + (v - lo) / (hi - lo) * (W - mL - mR); };
     var base = H - mB, altura = base - mT;
 
@@ -163,7 +161,7 @@
 
     // eixo
     svgEl("line", { x1: mL, x2: W - mR, y1: base + 0.5, y2: base + 0.5, stroke: "#D9CFC6", "stroke-width": 2 }, svg);
-    var passo = passoBonito(hi - lo);
+    var passo = passoBonito(hi - lo, Math.max(3, Math.min(7, Math.floor(W / (fs * 4.5)))));
     for (var t = Math.ceil(lo / passo) * passo; t <= hi + 1e-9; t += passo) {
       var tx = x(t);
       svgEl("line", { x1: tx, x2: tx, y1: base, y2: base + 6, stroke: "#D9CFC6", "stroke-width": 2 }, svg);
@@ -244,14 +242,13 @@
     document.getElementById("total").textContent = dados.length;
     METRICAS.forEach(desenharPontos);
     desenharLista("l-limite", contar("dentro_limite", ["Sim", "Não", "Não sei"]), function (r) { return r === COMITE.dentro_limite; });
-    desenharLista("l-ponto", contar("ponto_atencao", ["Concentração no maior sacado", "Inadimplência", "Construção civil", "Qualidade da base", "Outro"]), function (r) { return r === COMITE.ponto_atencao; });
     desenharLista("l-sacado", sacados(), function (r) { return r.toLowerCase().indexOf(COMITE.sacado) >= 0; });
   }
 
   // ---------- dados ao vivo ----------
   var assinatura = "";
   function buscar() {
-    var u = C.url + "/rest/v1/" + C.tabela + "?select=id,carteira,inadimplencia,maior_sacado,concentracao,dentro_limite,outubro,ponto_atencao&turma=eq." + encodeURIComponent(C.turma) + "&order=id.asc&limit=1000";
+    var u = C.url + "/rest/v1/" + C.tabela + "?select=id,carteira,inadimplencia,maior_sacado,concentracao,dentro_limite,outubro&turma=eq." + encodeURIComponent(C.turma) + "&order=id.asc&limit=1000";
     fetch(u, { headers: { apikey: C.key }, cache: "no-store" })
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (json) {
